@@ -1,145 +1,10 @@
 <main class="dashboard-container">
-  <!-- Header -->
-  <header class="dashboard-header">
-    <div class="header-logo">
-      <span class="logo-accent">LNX-JSP</span>
-      <span class="logo-text">Architect</span>
-    </div>
-    <div class="sys-pulse-container" [ngClass]="{'healthy': backendConnected() && databaseConnected(), 'warning': backendConnected() && !databaseConnected(), 'error': !backendConnected()}">
-      <span class="pulse-dot"></span>
-      <span class="pulse-label">
-        <ng-container *ngIf="backendConnected() && databaseConnected()">SISTEMA SAUDÁVEL</ng-container>
-        <ng-container *ngIf="backendConnected() && !databaseConnected()">ATENÇÃO: DB DEGRADADO</ng-container>
-        <ng-container *ngIf="!backendConnected()">ERRO: BACKEND INDISPONÍVEL</ng-container>
-      </span>
-    </div>
-  </header>
+  <!-- Navbar Shared -->
+  <app-navbar></app-navbar>
 
-  <!-- Title Section -->
-  <section class="hero-section">
-    <h1 class="main-title">Status da Infraestrutura</h1>
-    <p class="subtitle">Monitoramento em tempo real dos microsserviços containerizados da stack LNX-JSP.</p>
-  </section>
-
-  <!-- Service Status Grid -->
-  <section class="services-grid" id="status-cards">
-    
-    <!-- Card 1: Frontend -->
-    <div class="service-card active">
-      <div class="card-glow"></div>
-      <div class="card-header">
-        <div class="service-icon nginx-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        </div>
-        <span class="status-badge connected">ONLINE</span>
-      </div>
-      <div class="card-body">
-        <h2>lnx-jsp-frontend</h2>
-        <p class="desc">Interface web em Angular compilada de forma otimizada e servida via Nginx Alpine.</p>
-        <div class="meta-info">
-          <div class="meta-item">
-            <span class="meta-label">Servidor:</span>
-            <span class="meta-value">Nginx / Docker</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Porta Exposta:</span>
-            <span class="meta-value">80 (HTTP)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 2: Backend -->
-    <div class="service-card" [ngClass]="{'active': backendConnected(), 'inactive': !backendConnected()}">
-      <div class="card-glow"></div>
-      <div class="card-header">
-        <div class="service-icon spring-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
-        </div>
-        <span class="status-badge" [ngClass]="{'connected': backendConnected(), 'disconnected': !backendConnected()}">
-          {{ backendConnected() ? 'ONLINE' : 'OFFLINE' }}
-        </span>
-      </div>
-      <div class="card-body">
-        <h2>lnx-jsp-backend</h2>
-        <p class="desc">API REST baseada em Spring Boot 3.x rodando sobre Java 17 e JRE leve Eclipse Temurin.</p>
-        <div class="meta-info">
-          <div class="meta-item">
-            <span class="meta-label">Plataforma:</span>
-            <span class="meta-value">Java 17 (Temurin JRE)</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Porta Interna:</span>
-            <span class="meta-value">8080 (REST API)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Card 3: Database -->
-    <div class="service-card" [ngClass]="{'active': databaseConnected(), 'inactive': !databaseConnected()}">
-      <div class="card-glow"></div>
-      <div class="card-header">
-        <div class="service-icon db-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>
-        </div>
-        <span class="status-badge" [ngClass]="{'connected': databaseConnected(), 'disconnected': !databaseConnected()}">
-          {{ databaseConnected() ? 'CONNECTED' : 'DISCONNECTED' }}
-        </span>
-      </div>
-      <div class="card-body">
-        <h2>lnx-jsp-db</h2>
-        <p class="desc">Banco de dados relacional PostgreSQL persistido em volumes isolados e dedicados.</p>
-        <div class="meta-info">
-          <div class="meta-item">
-            <span class="meta-label">Engine:</span>
-            <span class="meta-value">PostgreSQL 16</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">Porta Interna:</span>
-            <span class="meta-value">5432 (TCP)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </section>
-
-  <!-- Error Alert and Logs -->
-  <section class="logs-section" *ngIf="errorMessage() || lastChecked()">
-    <div class="logs-header">
-      <h3>Terminal de Diagnóstico</h3>
-      <span class="timestamp" *ngIf="lastChecked()">Última sincronização: {{ lastChecked() }}</span>
-    </div>
-    <div class="console-box">
-      <div class="console-line line-info">
-        <span class="c-tag">[INFO]</span> Executando varredura no cluster local LNX-JSP...
-      </div>
-      <div class="console-line" [ngClass]="{'line-success': backendConnected(), 'line-error': !backendConnected()}">
-        <span class="c-tag">{{ backendConnected() ? '[SUCCESS]' : '[ERROR]' }}</span> 
-        Serviço lnx-jsp-backend na porta 8080: {{ backendConnected() ? 'Acessível (HTTP 200 OK)' : 'Inacessível.' }}
-      </div>
-      <div class="console-line" [ngClass]="{'line-success': databaseConnected(), 'line-error': !databaseConnected()}">
-        <span class="c-tag">{{ databaseConnected() ? '[SUCCESS]' : '[ERROR]' }}</span> 
-        Serviço lnx-jsp-db (PostgreSQL): {{ databaseConnected() ? 'Conexão validada com sucesso pelo backend.' : 'Falha na conexão do banco de dados.' }}
-      </div>
-      <div class="console-line line-error" *ngIf="errorMessage()">
-        <span class="c-tag">[FATAL-DETAILS]</span> {{ errorMessage() }}
-      </div>
-      <div class="console-line line-prompt">
-        <span class="c-cursor">></span> <span class="blink">_</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Controls -->
-  <div class="controls-container">
-    <button class="btn-refresh" (click)="checkHealth()" [disabled]="loading()">
-      <svg class="refresh-spinner" [ngClass]="{'spinning': loading()}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-      </svg>
-      <span>{{ loading() ? 'Verificando...' : 'Recarregar Status' }}</span>
-    </button>
+  <!-- Route Content -->
+  <div class="content-area">
+    <router-outlet></router-outlet>
   </div>
 
   <!-- Tech tags -->
@@ -149,7 +14,7 @@
       <span class="tag">Spring Boot 3.x</span>
       <span class="tag">PostgreSQL 16</span>
       <span class="tag">Docker Compose</span>
-      <span class="tag">LNX-JSP Cluster</span>
+      <span class="tag">LNX-JSP Boilerplate</span>
     </div>
   </footer>
 </main>

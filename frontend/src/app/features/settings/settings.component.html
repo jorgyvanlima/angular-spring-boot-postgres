@@ -1,0 +1,102 @@
+<section class="settings-container">
+  <div class="settings-header-section">
+    <h1 class="settings-title">Configurações Globais</h1>
+    <p class="settings-subtitle">Gerencie os parâmetros de sistema salvos no banco de dados PostgreSQL.</p>
+  </div>
+
+  <div class="settings-content-grid">
+    <!-- Form Card -->
+    <div class="settings-card form-card">
+      <div class="card-glow"></div>
+      <h2>{{ editMode ? 'Editar Configuração' : 'Nova Configuração' }}</h2>
+      
+      <form [formGroup]="settingForm" (ngSubmit)="onSubmit()" class="settings-form">
+        <div class="form-group">
+          <label for="key">Chave</label>
+          <input type="text" id="key" formControlName="key" placeholder="Ex: max_connections" [readOnly]="editMode">
+          <span class="error-msg" *ngIf="settingForm.get('key')?.invalid && settingForm.get('key')?.touched">
+            Chave é obrigatória e deve ter pelo menos 3 caracteres.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="value">Valor</label>
+          <input type="text" id="value" formControlName="value" placeholder="Ex: 500">
+          <span class="error-msg" *ngIf="settingForm.get('value')?.invalid && settingForm.get('value')?.touched">
+            Valor é obrigatório.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Categoria</label>
+          <select id="category" formControlName="category">
+            <option value="GERAL">Geral</option>
+            <option value="SEGURANCA">Segurança</option>
+            <option value="PERFORMANCE">Performance</option>
+            <option value="FRONTEND">Frontend</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descrição</label>
+          <textarea id="description" formControlName="description" rows="3" placeholder="Descrição do parâmetro..."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" *ngIf="editMode" (click)="cancelEdit()">Cancelar</button>
+          <button type="submit" class="btn-save" [disabled]="settingForm.invalid || formSaving">
+            {{ formSaving ? 'Salvando...' : (editMode ? 'Atualizar' : 'Adicionar') }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Table Card -->
+    <div class="settings-card list-card">
+      <div class="card-glow"></div>
+      <h2>Parâmetros Registrados</h2>
+
+      <div class="loading-overlay" *ngIf="loading()">
+        <span class="spinner"></span>
+      </div>
+
+      <div class="empty-state" *ngIf="!loading() && settings.length === 0">
+        Nenhum parâmetro cadastrado no banco.
+      </div>
+
+      <div class="table-responsive" *ngIf="!loading() && settings.length > 0">
+        <table class="settings-table">
+          <thead>
+            <tr>
+              <th>Chave</th>
+              <th>Valor</th>
+              <th>Categoria</th>
+              <th>Descrição</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let setting of settings">
+              <td class="key-cell">{{ setting.key }}</td>
+              <td class="value-cell"><code>{{ setting.value }}</code></td>
+              <td>
+                <span class="cat-badge" [ngClass]="setting.category?.toLowerCase() || 'geral'">
+                  {{ setting.category }}
+                </span>
+              </td>
+              <td class="desc-cell">{{ setting.description || '-' }}</td>
+              <td class="actions-cell">
+                <button type="button" class="btn-action edit" (click)="loadForEdit(setting)" title="Editar">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </button>
+                <button type="button" class="btn-action delete" (click)="deleteSetting(setting)" title="Excluir">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
