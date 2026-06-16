@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: lnx-jsp-backend
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:lnx_jsp_db}
+    username: ${DB_USER:lnx_jsp_user}
+    password: ${DB_PASSWORD:lnx_jsp_password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080

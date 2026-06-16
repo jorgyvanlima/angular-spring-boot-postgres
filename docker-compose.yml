@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  lnx-jsp-db:
+    image: postgres:16-alpine
+    container_name: lnx-jsp-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lnx_jsp_db
+      POSTGRES_USER: lnx_jsp_user
+      POSTGRES_PASSWORD: lnx_jsp_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - lnx-jsp-db-data:/var/lib/postgresql/data
+    networks:
+      - lnx-jsp-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lnx_jsp_user -d lnx_jsp_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  lnx-jsp-backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: lnx-jsp-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=lnx-jsp-db
+      - DB_PORT=5432
+      - DB_NAME=lnx_jsp_db
+      - DB_USER=lnx_jsp_user
+      - DB_PASSWORD=lnx_jsp_password
+    depends_on:
+      lnx-jsp-db:
+        condition: service_healthy
+    networks:
+      - lnx-jsp-net
+
+  lnx-jsp-frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    container_name: lnx-jsp-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - lnx-jsp-backend
+    networks:
+      - lnx-jsp-net
+
+volumes:
+  lnx-jsp-db-data:
+
+networks:
+  lnx-jsp-net:
+    driver: bridge
