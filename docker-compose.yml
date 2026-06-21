@@ -9,12 +9,12 @@ services:
       POSTGRES_DB: lnx_jsp_db
       POSTGRES_USER: lnx_jsp_user
       POSTGRES_PASSWORD: lnx_jsp_password
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "127.0.0.1:5432:5432" # Comente/Descomente se precisar de acesso local seguro ao banco de dados
     volumes:
       - lnx-jsp-db-data:/var/lib/postgresql/data
     networks:
-      - lnx-jsp-net
+      - backend_net
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U lnx_jsp_user -d lnx_jsp_db"]
       interval: 5s
@@ -27,8 +27,8 @@ services:
       dockerfile: backend.Dockerfile
     container_name: lnx-jsp-backend
     restart: unless-stopped
-    ports:
-      - "8080:8080"
+    # ports:
+    #   - "127.0.0.1:8080:8080" # Comente/Descomente para debugar a API localmente fora do proxy
     environment:
       - DB_HOST=lnx-jsp-db
       - DB_PORT=5432
@@ -39,7 +39,8 @@ services:
       lnx-jsp-db:
         condition: service_healthy
     networks:
-      - lnx-jsp-net
+      - frontend_net
+      - backend_net
 
   lnx-jsp-frontend:
     build:
@@ -48,15 +49,19 @@ services:
     container_name: lnx-jsp-frontend
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8085:80"
     depends_on:
       - lnx-jsp-backend
     networks:
-      - lnx-jsp-net
+      - frontend_net
 
 volumes:
   lnx-jsp-db-data:
 
 networks:
-  lnx-jsp-net:
+  frontend_net:
     driver: bridge
+  backend_net:
+    driver: bridge
+    internal: true # Torna a rede do banco 100% isolada da internet externa do host
+

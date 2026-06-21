@@ -4,6 +4,7 @@ import com.lnxjsp.backend.model.SystemSetting;
 import com.lnxjsp.backend.service.SystemSettingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class SystemSettingController {
 
     @PostMapping
     @Operation(summary = "Cria ou atualiza uma configuração (se a chave já existir, atualiza)")
-    public ResponseEntity<SystemSetting> saveOrUpdateSetting(@RequestBody SystemSetting setting) {
+    public ResponseEntity<SystemSetting> saveOrUpdateSetting(@Valid @RequestBody SystemSetting setting) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.saveOrUpdateSetting(setting));
     }
 

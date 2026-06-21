@@ -3,6 +3,8 @@ package com.lnxjsp.backend.service;
 import com.lnxjsp.backend.exception.ResourceNotFoundException;
 import com.lnxjsp.backend.model.SystemSetting;
 import com.lnxjsp.backend.repository.SystemSettingRepository;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,20 @@ public class SystemSettingServiceImpl implements SystemSettingService {
 
     @Override
     public SystemSetting saveOrUpdateSetting(SystemSetting setting) {
+        // Sanitização contra injeção de HTML/XSS
+        if (setting.getKey() != null) {
+            setting.setKey(Jsoup.clean(setting.getKey(), Safelist.none()));
+        }
+        if (setting.getValue() != null) {
+            setting.setValue(Jsoup.clean(setting.getValue(), Safelist.none()));
+        }
+        if (setting.getDescription() != null) {
+            setting.setDescription(Jsoup.clean(setting.getDescription(), Safelist.none()));
+        }
+        if (setting.getCategory() != null) {
+            setting.setCategory(Jsoup.clean(setting.getCategory(), Safelist.none()));
+        }
+
         // Se houver um registro com a mesma chave, atualiza o valor dele
         repository.findByKey(setting.getKey()).ifPresent(existing -> {
             setting.setId(existing.getId());
